@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Tabel Products — Data produk yang terdeteksi di TikTok
+// ============================================================
+model Product {
+  id         Int      @id @default(autoincrement())
+  productId  String   @unique @map("product_id") // ID asli dari TikTok
+  shopId     String?  @map("shop_id")
+  name       String?
+  niche      String
+  price      Float?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relasi: 1 Product bisa punya banyak AdExposure
+  adExposures AdExposure[]
+
+  @@map("products")
+}
+
+// ============================================================
+// Tabel Creators — Akun kreator afiliasi yang mempromosikan produk
+// ============================================================
+model Creator {
+  id            Int      @id @default(autoincrement())
+  creatorId     String   @unique @map("creator_id") // ID TikTok kreator
+  username      String
+  followerCount Int?     @map("follower_count")
+
+  // Relasi: 1 Creator bisa muncul di banyak AdExposure
+  adExposures AdExposure[]
+
+  @@map("creators")
+}
+
+// ============================================================
+// Tabel AdExposures — Tabel utama: mencatat setiap kali produk
+// terdeteksi di funnel (Search, FYP, atau Affiliate)
+// ============================================================
+model AdExposure {
+  id           Int          @id @default(autoincrement())
+  
+  // Foreign Keys
+  productId    Int          @map("product_id")
+  creatorId    Int?         @map("creator_id") // nullable: tidak semua exposure punya kreator
+  
+  // Data exposure
+  exposureType ExposureType @map("exposure_type") // SEARCH | FYP | AFFILIATE
+  keyword      String?      // keyword yang dipakai saat Search
+  isPaidAd     Boolean      @default(false) @map("is_paid_ad")
+  affiliateCount Int        @default(0) @map("affiliate_count")
+  fypDetected  Boolean      @default(false) @map("fyp_detected")
+  status       String       @default("SAVED") // status untuk kolom di tabel dashboard
+  
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  // Relasi balik ke Product dan Creator
+  product  Product  @relation(fields: [productId], references: [id])
+  creator  Creator? @relation(fields: [creatorId], references: [id])
+
+  @@map("ad_exposures")
+}
+
+// ============================================================
+// Enum untuk tipe exposure
+// ============================================================
+enum ExposureType {
+  SEARCH
+  FYP
+  AFFILIATE
+}

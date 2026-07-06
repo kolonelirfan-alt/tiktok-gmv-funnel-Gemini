@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok GMV Max Funnel Tracker - Dashboard</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons via CDN untuk mempercantik UI -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen">
+
+    <!-- Top Navigation -->
+    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="radar" class="text-rose-500 w-6 h-6 animate-pulse"></i>
+            <h1 class="text-xl font-bold tracking-wide">TikTok GMV Max <span class="text-rose-500">Funnel Tracker</span></h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div id="statusBadge" class="flex items-center space-x-2 bg-gray-800 px-3 py-1.5 rounded-full text-xs">
+                <span id="statusDot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                <span id="statusText" class="text-gray-400 font-medium">Menghubungkan ke backend...</span>
+            </div>
+            <div class="text-xs text-gray-400">Environment: <span class="text-amber-400 font-mono">Localhost:3000</span></div>
+        </div>
+    </header>
+
+    <main class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Kolom Kiri: Control Panel & Playwright Logs -->
+        <div class="space-y-6 lg:col-span-1">
+            <!-- Control Panel -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                    <i data-lucide="sliders" class="w-4 h-4 mr-2 text-rose-500"></i> Control Panel
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-2">Target Niche</label>
+                        <select id="nicheSelect" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-rose-500">
+                            <option value="Jeans">Jeans (Denim & Kulot)</option>
+                            <option value="Jaket">Jaket (Parka & Motor)</option>
+                            <option value="Baju">Baju (Kaos Oversize)</option>
+                            <option value="Jersey">Jersey (Sepakbola/Futsal)</option>
+                            <option value="Sendal">Sendal (Slide & Kasual)</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <button id="btnStart" onclick="startTracking()" class="bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all">
+                            <i data-lucide="play" class="w-4 h-4"></i> <span>Mulai Bot</span>
+                        </button>
+                        <button id="btnStop" onclick="stopTracking()" disabled class="bg-gray-800 opacity-50 cursor-not-allowed text-gray-400 font-medium text-sm py-2 px-4 rounded-lg flex items-center justify-center space-x-2 transition-all">
+                            <i data-lucide="square" class="w-4 h-4"></i> <span>Stop Bot</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stealth Metrics -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                    <i data-lucide="shield-check" class="w-4 h-4 mr-2 text-green-400"></i> Anti-Bot Behavior Simulation
+                </h2>
+                <div class="space-y-3 text-xs">
+                    <div class="flex justify-between py-1.5 border-b border-gray-800">
+                        <span class="text-gray-400">Mouse Path Agent:</span>
+                        <span class="text-green-400 font-mono">Human Bezier Curve v2</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-gray-800">
+                        <span class="text-gray-400">Typing Jeda Per Karakter:</span>
+                        <span class="text-amber-400 font-mono">110ms - 290ms (Random)</span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-gray-800">
+                        <span class="text-gray-400">Canvas Fingerprint:</span>
+                        <span class="text-green-400 font-mono">Masked / Randomized</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">IP Proxy Pool:</span>
+                        <span class="text-indigo-400 font-mono">ID Residential Mobile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kolom Tengah & Kanan: Terminal Logs & Database Preview -->
+        <div class="space-y-6 lg:col-span-2">
+            
+            <!-- Terminal Log Real-time -->
+            <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden shadow-2xl flex flex-col h-72">
+                <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500"></div>
+                        <span class="text-xs text-gray-400 font-mono pl-2">playwright-session-terminal.log</span>
+                    </div>
+                    <i data-lucide="terminal" class="w-4 h-4 text-gray-500"></i>
+                </div>
+                <div id="terminalBody" class="p-4 font-mono text-xs text-green-400 overflow-y-auto space-y-1.5 flex-1 bg-black">
+                    <span class="text-gray-500">[SYSTEM] Sistem siap. Pilih niche dan klik "Mulai Bot" untuk mensimulasikan alur tracking...</span>
+                </div>
+            </div>
+
+            <!-- Visualisasi Deteksi Funnel GMV Max -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                    <i data-lucide="git-commit" class="w-4 h-4 mr-2 text-rose-500"></i> Deteksi Hubungan Pola Multi-Exposure (Funnel)
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center relative">
+                    <!-- Step 1 -->
+                    <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 relative z-10">
+                        <div class="w-7 h-7 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-bold border border-blue-500/30">1</div>
+                        <div class="text-xs font-semibold">Search Intent</div>
+                        <div id="fnSearch" class="text-[10px] text-gray-500 mt-1">-</div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 relative z-10">
+                        <div class="w-7 h-7 bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-bold border border-amber-500/30">2</div>
+                        <div class="text-xs font-semibold">FYP Sponsored</div>
+                        <div id="fnFyp" class="text-[10px] text-gray-500 mt-1">-</div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-gray-950 p-3 rounded-lg border border-gray-800 relative z-10">
+                        <div class="w-7 h-7 bg-purple-500/10 text-purple-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-bold border border-purple-500/30">3</div>
+                        <div class="text-xs font-semibold">3x Affiliate Proof</div>
+                        <div id="fnAffiliate" class="text-[10px] text-gray-500 mt-1">-</div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="bg-gray-950 p-3 rounded-lg border border-rose-900/50 bg-rose-950/10 relative z-10">
+                        <div class="w-7 h-7 bg-rose-500/10 text-rose-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-bold border border-rose-500/30">4</div>
+                        <div class="text-xs font-semibold text-rose-400">Match & Save</div>
+                        <div id="fnResult" class="text-[10px] text-gray-500 mt-1">Pending</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Database PostgreSQL Preview -->
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center">
+                        <i data-lucide="database" class="w-4 h-4 mr-2 text-indigo-400"></i> Live PostgreSQL Preview (ad_exposures combined)
+                    </h2>
+                    <span class="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800 font-mono">Table: multi_touch_attribution</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-950 text-gray-400 border-b border-gray-800 font-mono">
+                            <tr>
+                                <th class="p-3">Product ID</th>
+                                <th class="p-3">Niche</th>
+                                <th class="p-3">Search Keywords</th>
+                                <th class="p-3">FYP Ad Detection</th>
+                                <th class="p-3">Affiliate Count</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dbTableBody" class="divide-y divide-gray-800/50 font-mono">
+                            <tr>
+                                <td colspan="6" class="p-4 text-center text-gray-600 italic">Database kosong. Jalankan bot untuk memasukkan data hasil scraping...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ============================================================
+         Backend Integration — Fetch + Server-Sent Events (SSE)
+         Semua fungsi di sini terhubung ke backend Express di port 3000
+    ============================================================ -->
+    <script>
+        // Inisialisasi Ikon Lucide
+        lucide.createIcons();
+
+        const API_BASE = 'http://localhost:3000';
+        let isRunning = false;
+        let eventSource = null; // koneksi SSE
+
+        // ─── UTILITY ─────────────────────────────────────────────────
+        function addLog(text, highlightClass = 'text-green-400') {
+            const terminal = document.getElementById('terminalBody');
+            const timestamp = new Date().toLocaleTimeString();
+            const logRow = document.createElement('div');
+            logRow.className = `${highlightClass} leading-relaxed`;
+            logRow.innerHTML = `<span class="text-gray-600">[${timestamp}]</span> ${text}`;
+            terminal.appendChild(logRow);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function setRunningUI(running) {
+            isRunning = running;
+            document.getElementById('btnStart').disabled = running;
+            document.getElementById('btnStop').disabled = !running;
+            document.getElementById('btnStart').classList.toggle('opacity-50', running);
+            document.getElementById('btnStart').classList.toggle('cursor-not-allowed', running);
+            document.getElementById('btnStop').classList.toggle('opacity-50', !running);
+            document.getElementById('btnStop').classList.toggle('cursor-not-allowed', !running);
+        }
+
+        // ─── STATUS CHECK ─────────────────────────────────────────────
+        async function checkStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/api/status`);
+                const data = await res.json();
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+                if (data.running) {
+                    dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+                    text.textContent = 'Playwright Core: Scraping...';
+                    text.className = 'text-amber-300 font-medium';
+                } else {
+                    dot.className = 'w-2 h-2 rounded-full bg-green-500 animate-ping';
+                    text.textContent = 'Playwright Core: Ready';
+                    text.className = 'text-gray-300 font-medium';
+                }
+            } catch {
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+                dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                text.textContent = 'Backend Offline — Jalankan: npm run dev';
+                text.className = 'text-red-400 font-medium';
+            }
+        }
+
+        // ─── SSE: Terima log real-time dari backend ────────────────────
+        function connectSSE() {
+            if (eventSource) eventSource.close();
+
+            eventSource = new EventSource(`${API_BASE}/api/scrape/logs`);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleSSEEvent(data);
+            };
+
+            eventSource.onerror = () => {
+                // SSE putus, coba reconnect otomatis setelah 3 detik
+                setTimeout(connectSSE, 3000);
+            };
+        }
+
+        function handleSSEEvent(data) {
+            const { type, stage, message } = data;
+
+            // Tampilkan log di terminal dengan warna sesuai tipe
+            const colorMap = {
+                sys: 'text-gray-400',
+                search: 'text-blue-400',
+                intercept: 'text-indigo-400 font-semibold',
+                fyp: 'text-amber-400',
+                match: 'text-rose-400 font-bold',
+                affiliate: 'text-purple-400',
+                db: 'text-emerald-400 font-bold',
+                success: 'text-emerald-400 font-bold',
+                stopped: 'text-red-400 font-bold',
+                error: 'text-red-500 font-bold',
+                done: 'text-cyan-400',
+            };
+            addLog(message, colorMap[type] || 'text-green-400');
+
+            // Update Funnel Stage visual
+            if (type === 'search' || (stage === 'search' && type === 'intercept')) {
+                document.getElementById('fnSearch').innerHTML =
+                    `<span class="text-blue-400 font-medium">Ad Spotted ✓</span>`;
+                document.getElementById('fnFyp').innerHTML =
+                    '<span class="text-amber-500 animate-pulse">Scrolling FYP...</span>';
+            }
+            if (type === 'match') {
+                document.getElementById('fnFyp').innerHTML =
+                    '<span class="text-green-400 font-medium">Sponsored Match! ✓</span>';
+                document.getElementById('fnAffiliate').innerHTML =
+                    '<span class="text-amber-500 animate-pulse">Scanning Affiliate...</span>';
+            }
+            if (type === 'affiliate') {
+                document.getElementById('fnAffiliate').innerHTML =
+                    '<span class="text-purple-400 font-medium">Creators Linked ✓</span>';
+            }
+            if (type === 'success' || type === 'db') {
+                document.getElementById('fnResult').innerHTML = '✓ Captured';
+                document.getElementById('fnResult').className = 'text-[10px] text-green-400 font-bold mt-1';
+            }
+            if (type === 'done' || type === 'stopped') {
+                setRunningUI(false);
+                checkStatus();
+                // Refresh tabel database setelah scraping selesai
+                if (type === 'done') loadReports();
+            }
+            if (type === 'error') {
+                setRunningUI(false);
+                checkStatus();
+            }
+        }
+
+        // ─── START TRACKING ──────────────────────────────────────────
+        async function startTracking() {
+            if (isRunning) return;
+
+            const niche = document.getElementById('nicheSelect').value;
+
+            // Reset UI
+            document.getElementById('terminalBody').innerHTML = '';
+            document.getElementById('fnSearch').innerHTML = '<span class="text-amber-500 animate-pulse">Scanning...</span>';
+            document.getElementById('fnFyp').innerHTML = '-';
+            document.getElementById('fnAffiliate').innerHTML = '-';
+            document.getElementById('fnResult').innerHTML = 'Processing...';
+            document.getElementById('fnResult').className = 'text-[10px] text-amber-500 font-semibold mt-1';
+
+            setRunningUI(true);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/scrape/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ niche }),
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    addLog(`[ERROR] ${err.error}`, 'text-red-400 font-bold');
+                    setRunningUI(false);
+                    return;
+                }
+
+                checkStatus();
+            } catch (err) {
+                addLog('[ERROR] Tidak bisa terhubung ke backend. Pastikan server berjalan: npm run dev', 'text-red-400 font-bold');
+                setRunningUI(false);
+            }
+        }
+
+        // ─── STOP TRACKING ───────────────────────────────────────────
+        async function stopTracking() {
+            if (!isRunning) return;
+            try {
+                await fetch(`${API_BASE}/api/scrape/stop`, { method: 'POST' });
+            } catch {
+                addLog('[ERROR] Gagal menghentikan session.', 'text-red-400');
+            }
+        }
+
+        // ─── LOAD REPORTS (tabel database) ───────────────────────────
+        async function loadReports() {
+            try {
+                const res = await fetch(`${API_BASE}/api/reports?limit=20`);
+                const json = await res.json();
+                const tbody = document.getElementById('dbTableBody');
+
+                if (!json.data || json.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-600 italic">Database kosong. Jalankan bot untuk memasukkan data hasil scraping...</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                for (const row of json.data) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-800/30 hover:bg-gray-900/30 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-3 text-gray-300 font-bold font-mono text-[11px]">${row.productId}</td>
+                        <td class="p-3 text-gray-400">${row.niche}</td>
+                        <td class="p-3 text-blue-400">"${row.keyword}"</td>
+                        <td class="p-3 ${row.fypDetected ? 'text-green-400 font-semibold' : 'text-gray-500'}">${row.fypDetected ? 'TRUE (GMV MAX)' : 'FALSE'}</td>
+                        <td class="p-3 text-purple-400 text-center font-bold">${row.affiliateCount} Creators</td>
+                        <td class="p-3"><span class="bg-emerald-950 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-800 font-bold">${row.status}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            } catch {
+                // Backend belum siap, abaikan
+            }
+        }
+
+        // ─── INIT ────────────────────────────────────────────────────
+        // Cek status backend & hubungkan SSE saat halaman dibuka
+        checkStatus();
+        connectSSE();
+        loadReports();
+
+        // Cek status setiap 10 detik
+        setInterval(checkStatus, 10000);
+    </script>
+</body>
+</html>
